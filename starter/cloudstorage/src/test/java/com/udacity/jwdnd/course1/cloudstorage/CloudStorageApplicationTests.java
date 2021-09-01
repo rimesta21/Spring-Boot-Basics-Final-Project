@@ -4,7 +4,9 @@ import com.udacity.jwdnd.course1.cloudstorage.pages.LoginPage;
 import com.udacity.jwdnd.course1.cloudstorage.pages.SignupPage;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -49,6 +51,18 @@ class CloudStorageApplicationTests {
 		LoginPage login = new LoginPage(driver);
 		login.fillOutLogin("rimesta", "1234");
 		Assertions.assertEquals("Home", driver.getTitle());
+	}
+
+	@Test
+	public void testExistingUsername() {
+		driver.get("http://localhost:" + this.port + "/signup");
+		SignupPage signup = new SignupPage(driver);
+		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");
+		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");
+		WebElement errorMsg = driver.findElement(By.id("error-msg"));
+		Assertions.assertTrue(errorMsg.isDisplayed());
+		Assertions.assertEquals("The username already exists.",errorMsg.getText());
+
 	}
 
 }
