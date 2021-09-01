@@ -73,6 +73,29 @@ class CloudStorageApplicationTests {
 		signup.goToLogin(driver);
 		LoginPage login = new LoginPage(driver);
 		login.fillOutLogin("rimesta", "1423");
+		WebElement errorMsg = driver.findElement(By.id("error-msg"));
+		Assertions.assertTrue(errorMsg.isDisplayed());
+		Assertions.assertEquals("Invalid username or password",errorMsg.getText());
+		Assertions.assertEquals("Login", driver.getTitle());
+	}
+
+	@Test
+	public void testInvalidUsername() {
+		driver.get("http://localhost:" + this.port + "/signup");
+		SignupPage signup = new SignupPage(driver);
+		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");
+		signup.goToLogin(driver);
+		LoginPage login = new LoginPage(driver);
+		login.fillOutLogin("rimetas", "1423");
+		WebElement errorMsg = driver.findElement(By.id("error-msg"));
+		Assertions.assertTrue(errorMsg.isDisplayed());
+		Assertions.assertEquals("Invalid username or password",errorMsg.getText());
+		Assertions.assertEquals("Login", driver.getTitle());
+	}
+
+	@Test
+	public void testUnauthorizedHomeRequest() {
+		driver.get("http://localhost:" + this.port + "/home");
 		Assertions.assertEquals("Login", driver.getTitle());
 	}
 
