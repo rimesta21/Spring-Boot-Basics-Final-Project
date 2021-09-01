@@ -1,5 +1,6 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
+import com.udacity.jwdnd.course1.cloudstorage.pages.HomePage;
 import com.udacity.jwdnd.course1.cloudstorage.pages.LoginPage;
 import com.udacity.jwdnd.course1.cloudstorage.pages.SignupPage;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -98,5 +99,20 @@ class CloudStorageApplicationTests {
 		driver.get("http://localhost:" + this.port + "/home");
 		Assertions.assertEquals("Login", driver.getTitle());
 	}
+
+	@Test
+	public void testFromLoginToSignupToHomeToLogOut() {
+		driver.get("http://localhost:" + this.port + "/login");
+		LoginPage login = new LoginPage(driver);
+		login.goToSignUp();
+		SignupPage signup = new SignupPage(driver);
+		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");
+		signup.goToLogin(driver);
+		login.fillOutLogin("rimesta", "1423");
+		HomePage homepage = new HomePage(driver);
+		homepage.logout();
+		Assertions.assertEquals("Login", driver.getTitle());
+	}
+
 
 }
