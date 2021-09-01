@@ -65,4 +65,15 @@ class CloudStorageApplicationTests {
 
 	}
 
+	@Test
+	public void testInvalidPassword() {
+		driver.get("http://localhost:" + this.port + "/signup");
+		SignupPage signup = new SignupPage(driver);
+		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");
+		signup.goToLogin(driver);
+		LoginPage login = new LoginPage(driver);
+		login.fillOutLogin("rimesta", "1423");
+		Assertions.assertEquals("Login", driver.getTitle());
+	}
+
 }
