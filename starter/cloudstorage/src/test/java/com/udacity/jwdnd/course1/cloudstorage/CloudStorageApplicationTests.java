@@ -117,5 +117,23 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals("Login", driver.getTitle());
 	}
 
+	private void signupAndSignIn() {
+		driver.get("http://localhost:" + this.port + "/login");
+		LoginPage login = new LoginPage(driver);
+		login.goToSignUp();
+		SignupPage signup = new SignupPage(driver);
+		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");
+		signup.goToLogin(driver);
+		login.fillOutLogin("rimesta", "1234");
+	}
+
+	@Test
+	public void testUploadFile() {
+		signupAndSignIn();
+		HomePage homepage = new HomePage(driver);
+		homepage.uploadFile(driver, "C://Users/rimes/OneDrive/Pictures/In my Mind (3).jpg");
+		Assertions.assertEquals("In my Mind (3).jpg", homepage.checkForXFile(1));
+	}
+
 
 }
