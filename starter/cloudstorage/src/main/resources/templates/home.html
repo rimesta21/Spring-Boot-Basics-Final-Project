@@ -51,7 +51,7 @@
                                 <tbody>
                                 <tr th:each = "fileName : ${files}">
                                     <td>
-                                        <a target="_blank" class="btn btn-success">View</a>
+                                        <a id = "view-btn" target="_blank" class="btn btn-success">View</a>
                                         <a  class="btn btn-danger">Delete</a>
                                     </td>
                                     <th id = "fileNames" th:text="${fileName}" scope="row">ExampleFile.txt</th>

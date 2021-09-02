@@ -12,6 +12,9 @@ public class ResultsPage {
     @FindBy(id = "linkFailed")
     private WebElement failed;
 
+    @FindBy(id = "download")
+    private WebElement download;
+
     public ResultsPage(WebDriver driver) {
         PageFactory.initElements(driver, this);
     }
@@ -23,4 +26,6 @@ public class ResultsPage {
     public void clickContFailure() {
         failed.click();
     }
+
+    public void downloadFile() {download.click();}
 }

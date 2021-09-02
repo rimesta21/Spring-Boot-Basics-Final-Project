@@ -19,6 +19,9 @@ public class HomePage {
     @FindBy(id = "fileNames")
     private List<WebElement> files;
 
+    @FindBy(id = "view-btn")
+    private List <WebElement> viewBtn;
+
     public HomePage(WebDriver driver) {
         PageFactory.initElements(driver, this);
     }
@@ -34,5 +37,9 @@ public class HomePage {
 
     public String checkForXFile(int index) {
         return files.get(index).getText();
+    }
+
+    public void viewXFile(int index) {
+        viewBtn.get(index).click();
     }
 }

@@ -14,6 +14,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
+import java.io.File;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CloudStorageApplicationTests {
 
@@ -136,6 +138,37 @@ class CloudStorageApplicationTests {
 		ResultsPage resultPage = new ResultsPage(driver);
 		resultPage.clickContSuccess();
 		Assertions.assertEquals("test.txt", homepage.checkForXFile(0));
+	}
+
+	@Test
+	public void testViewDownloadFile() {
+		signupAndSignIn();
+		HomePage homepage = new HomePage(driver);
+		homepage.uploadFile(driver, "C://Users/rimes/OneDrive/Desktop/Java Practice/test.txt");
+		ResultsPage resultPage = new ResultsPage(driver);
+		resultPage.clickContSuccess();
+
+		homepage.viewXFile(0);
+		resultPage.downloadFile();
+		Assertions.assertTrue(isFileDownloaded("C://Users/rimes/Downloads", "test.txt"));
+	}
+
+	private void uploadFile() {
+
+	}
+
+	public boolean isFileDownloaded(String downloadPath, String fileName) {
+		File dir = new File(downloadPath);
+		File[] dirContents = dir.listFiles();
+
+		for (int i = 0; i < dirContents.length; i++) {
+			if (dirContents[i].getName().equals(fileName)) {
+				// File has been found, it can now be deleted:
+				dirContents[i].delete();
+				return true;
+			}
+		}
+		return false;
 	}
 
 

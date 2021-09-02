@@ -50,5 +50,21 @@ public class HomeController {
         return "result";
     }
 
+    @PostMapping("/file-view")
+    public String viewFile(@RequestParam("fileUpload") MultipartFile fileUpload,
+                             Authentication authentication, Model model) {
+        int userId = Integer.parseInt(authentication.getName());
+        int success = fileService.addFile(fileUpload, userId);
+        if(success == -1) {
+            model.addAttribute("failed", "It seems like there was an error converting you file. Please try again.");
+        } else if (success == 0) {
+            model.addAttribute("failed", "It seems like there was a network error. Please try again.");
+        } else {
+            model.addAttribute("success", true);
+            model.addAttribute("files", fileService.getFileNames(userId));
+        }
+        return "result";
+    }
+
 
 }

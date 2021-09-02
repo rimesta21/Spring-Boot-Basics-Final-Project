@@ -19,6 +19,15 @@
                 <span th:text="${failed}" >Example Error Message</span>
                 <span >Click <a id = "linkFailed" th:href = "@{/home}">here</a> to continue.</span>
             </div>
+            <div th:if="${success}" class="alert alert-success fill-parent">
+                <h1 class="display-5">Success</h1>
+                <span >Your changes were successfully saved. Click <a id = "linkSuccess" th:href="@{/home}">here</a> to continue.</span>
+            </div>
+            <div th:if="${failed}" class="alert alert-danger fill-parent">
+                <h1 class="display-5">Error</h1>
+                <span th:text="${failed}" >Example Error Message</span>
+                <span >Click <a id = "linkFailed" th:href = "@{/home}">here</a> to continue.</span>
+            </div>
         </div>
     </body>
 </html>
