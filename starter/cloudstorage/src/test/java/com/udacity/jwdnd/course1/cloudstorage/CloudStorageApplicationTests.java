@@ -2,6 +2,7 @@ package com.udacity.jwdnd.course1.cloudstorage;
 
 import com.udacity.jwdnd.course1.cloudstorage.pages.HomePage;
 import com.udacity.jwdnd.course1.cloudstorage.pages.LoginPage;
+import com.udacity.jwdnd.course1.cloudstorage.pages.ResultsPage;
 import com.udacity.jwdnd.course1.cloudstorage.pages.SignupPage;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
@@ -131,8 +132,10 @@ class CloudStorageApplicationTests {
 	public void testUploadFile() {
 		signupAndSignIn();
 		HomePage homepage = new HomePage(driver);
-		homepage.uploadFile(driver, "C://Users/rimes/OneDrive/Pictures/In my Mind (3).jpg");
-		Assertions.assertEquals("In my Mind (3).jpg", homepage.checkForXFile(1));
+		homepage.uploadFile(driver, "C://Users/rimes/OneDrive/Desktop/Java Practice/test.txt");
+		ResultsPage resultPage = new ResultsPage(driver);
+		resultPage.clickContSuccess();
+		Assertions.assertEquals("test.txt", homepage.checkForXFile(0));
 	}
 
 

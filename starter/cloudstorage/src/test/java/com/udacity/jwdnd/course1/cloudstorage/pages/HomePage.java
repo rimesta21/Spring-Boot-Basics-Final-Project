@@ -16,7 +16,7 @@ public class HomePage {
     @FindBy(id = "fileUpload")
     private WebElement fileUpload;
 
-    @FindBy(id = "files")
+    @FindBy(id = "fileNames")
     private List<WebElement> files;
 
     public HomePage(WebDriver driver) {
