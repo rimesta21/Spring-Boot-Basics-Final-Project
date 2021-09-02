@@ -143,28 +143,29 @@ class CloudStorageApplicationTests {
 	@Test
 	public void testViewDownloadFile() {
 		signupAndSignIn();
+		uploadFile();
 		HomePage homepage = new HomePage(driver);
-		homepage.uploadFile(driver, "C://Users/rimes/OneDrive/Desktop/Java Practice/test.txt");
-		ResultsPage resultPage = new ResultsPage(driver);
-		resultPage.clickContSuccess();
-
 		homepage.viewXFile(0);
-		resultPage.downloadFile();
-		Assertions.assertTrue(isFileDownloaded("C://Users/rimes/Downloads", "test.txt"));
+		ResultsPage resultPage = new ResultsPage(driver);
+		resultPage.downloadFile(driver);
+		Assertions.assertTrue(isFileDownloaded("C://Users/rimes/Downloads", "In my Mind (3).jpg"));
 	}
 
 	private void uploadFile() {
-
+		HomePage homepage = new HomePage(driver);
+		homepage.uploadFile(driver, "C://Users/rimes/OneDrive/Pictures/In my Mind (3).jpg");
+		ResultsPage resultPage = new ResultsPage(driver);
+		resultPage.clickContSuccess();
 	}
 
 	public boolean isFileDownloaded(String downloadPath, String fileName) {
 		File dir = new File(downloadPath);
 		File[] dirContents = dir.listFiles();
 
-		for (int i = 0; i < dirContents.length; i++) {
-			if (dirContents[i].getName().equals(fileName)) {
+		for (File dirContent : dirContents) {
+			if (dirContent.getName().equals(fileName)) {
 				// File has been found, it can now be deleted:
-				dirContents[i].delete();
+				dirContent.delete();
 				return true;
 			}
 		}

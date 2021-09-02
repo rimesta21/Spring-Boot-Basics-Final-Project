@@ -1,10 +1,8 @@
 package com.udacity.jwdnd.course1.cloudstorage.mappers;
 
-import com.udacity.jwdnd.course1.cloudstorage.models.File;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
+
+import com.udacity.jwdnd.course1.cloudstorage.models.dbFile;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -12,8 +10,14 @@ import java.util.List;
 public interface FileMapper {
     @Insert("INSERT INTO FILES (fileName, contentType, fileSize, userId, fileData) VALUES(#{fileName}, #{contentType}, #{fileSize}, #{userId}, #{fileData})")
     @Options(useGeneratedKeys = true, keyProperty = "fileId")
-    int insert(File file);
+    int insert(dbFile file);
 
     @Select("SELECT fileName FROM FILES WHERE userId = #{userId}")
     List<String>  getFileNames(int userId);
+
+    @Select("SELECT * FROM FILES WHERE fileName = #{fileName} AND userId = #{userId}")
+    dbFile getFileByFileName(String fileName, Integer userId);
+
+    @Delete("DELETE FROM FILES WHERE fileName = #{fileName} AND userId = #{userId}")
+    void delete(String fileName, Integer userId);
 }
