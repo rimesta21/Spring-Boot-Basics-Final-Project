@@ -53,7 +53,7 @@
                                     <td>
                                         <form th:action="@{/home/view-delete}" method = "GET">
                                             <button id = "view-btn" type="submit" th:name="action" th:value="${'nodele' + fileName}" class="btn btn-success">View</button>
-                                            <button type="submit" th:name="action" th:value="${'delete'+fileName}" class="btn btn-danger">Delete</button>
+                                            <button id = "delete-btn" type="submit" th:name="action" th:value="${'delete'+fileName}" class="btn btn-danger">Delete</button>
                                         </form>
                                     </td>
                                     <th id = "fileNames" th:text="${fileName}" scope="row">ExampleFile.txt</th>

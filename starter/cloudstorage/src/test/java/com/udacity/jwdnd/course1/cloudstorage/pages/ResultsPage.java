@@ -17,6 +17,9 @@ public class ResultsPage {
     @FindBy(id = "download-btn")
     private WebElement download;
 
+    @FindBy(id = "delete-btn")
+    private WebElement delete;
+
     public ResultsPage(WebDriver driver) {
         PageFactory.initElements(driver, this);
     }
@@ -33,4 +36,10 @@ public class ResultsPage {
         WebDriverWait wait = new WebDriverWait(driver, 10);
         wait.until(webDriver -> webDriver.findElement(By.id("download-btn")));
         download.click();}
+
+    public void deleteFile(WebDriver driver) {
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        wait.until(webDriver -> webDriver.findElement(By.id("delete-btn")));
+        delete.click();
+    }
 }

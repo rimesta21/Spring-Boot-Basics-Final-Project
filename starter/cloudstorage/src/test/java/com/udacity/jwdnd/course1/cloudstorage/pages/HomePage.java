@@ -22,6 +22,9 @@ public class HomePage {
     @FindBy(id = "view-btn")
     private List <WebElement> viewBtn;
 
+    @FindBy(id = "delete-btn")
+    private List<WebElement> delete;
+
     public HomePage(WebDriver driver) {
         PageFactory.initElements(driver, this);
     }
@@ -41,5 +44,9 @@ public class HomePage {
 
     public void viewXFile(int index) {
         viewBtn.get(index).click();
+    }
+
+    public void deleteXFile(int index) {
+        delete.get(index).click();
     }
 }

@@ -158,7 +158,7 @@ class CloudStorageApplicationTests {
 		resultPage.clickContSuccess();
 	}
 
-	public boolean isFileDownloaded(String downloadPath, String fileName) {
+	private boolean isFileDownloaded(String downloadPath, String fileName) {
 		File dir = new File(downloadPath);
 		File[] dirContents = dir.listFiles();
 
@@ -170,6 +170,19 @@ class CloudStorageApplicationTests {
 			}
 		}
 		return false;
+	}
+
+	@Test
+	public void testDeleteUploadedFile() {
+		signupAndSignIn();
+		uploadFile();
+		HomePage homepage = new HomePage(driver);
+		Assertions.assertEquals("In my Mind (3).jpg", homepage.checkForXFile(0));
+		homepage.deleteXFile(0);
+		ResultsPage resultspage = new ResultsPage(driver);
+		resultspage.deleteFile(driver);
+		resultspage.clickContSuccess();
+		Assertions.assertEquals("ExampleFile.txt", homepage.checkForXFile(0));
 	}
 
 
