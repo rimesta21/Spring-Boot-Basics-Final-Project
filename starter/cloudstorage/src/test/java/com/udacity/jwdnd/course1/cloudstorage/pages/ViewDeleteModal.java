@@ -24,10 +24,12 @@ public class ViewDeleteModal {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("download-btn")));
         download.click();}
 
-    public void deleteFile(WebDriver driver) {
+    public void delete(WebDriver driver) {
         WebDriverWait wait = new WebDriverWait(driver, 10);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("delete-btn-modal")));
         delete.click();
     }
 }
+
+
 

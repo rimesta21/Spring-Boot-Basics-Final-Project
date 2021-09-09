@@ -3,10 +3,9 @@ package com.udacity.jwdnd.course1.cloudstorage;
 import com.udacity.jwdnd.course1.cloudstorage.pages.*;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -181,11 +180,88 @@ class CloudStorageApplicationTests {
 		homepage.deleteXFile(0);
 		driver.switchTo().activeElement();
 		ViewDeleteModal viewDeleteModal = new ViewDeleteModal(driver);
-		viewDeleteModal.deleteFile(driver);
+		viewDeleteModal.delete(driver);
 		ResultsPage resultspage = new ResultsPage(driver);
 		resultspage.clickContSuccess();
 		Assertions.assertEquals("ExampleFile.txt", homepage.checkForXFile(0));
 	}
 
+	@Test
+	public void testUploadCredential() {
+		signupAndSignIn();
+		HomePage homepage = new HomePage(driver);
+		homepage.goToAddCredential(driver);
+		driver.switchTo().activeElement();
+		CredentialModal credentialModal = new CredentialModal(driver);
+		credentialModal.enterCredentials("google.com", "rimesta", "1234", driver);
+		ResultsPage resultPage = new ResultsPage(driver);
+		resultPage.clickContSuccess();
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("credentialUrl")));
+		Assertions.assertEquals("google.com", homepage.checkForXUrl(0));
+		Assertions.assertEquals("rimesta", homepage.checkForXUsername(0));
+		Assertions.assertNotEquals("1234", homepage.checkForXPassword(0));
+	}
+
+	@Test
+	public void testEditCredential() {
+		uploadCredential();
+		HomePage homepage = new HomePage(driver);
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("edit-btn-credential")));
+		homepage.editXCredential(0);
+		driver.switchTo().activeElement();
+		CredentialModal credentialModal = new CredentialModal(driver);
+		//checks that the original password was saved (wasn't checked in the test before its checked here)
+		Assertions.assertEquals("1234", credentialModal.returnOriginalPassword(driver));
+		credentialModal.clearCredentials(driver);
+		credentialModal.enterCredentials("google1.com", "rimesta11", "4321", driver);
+		ResultsPage resultPage = new ResultsPage(driver);
+		resultPage.clickContSuccess();
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("credentialUrl")));
+		Assertions.assertEquals("google1.com", homepage.checkForXUrl(0));
+		Assertions.assertEquals("rimesta11", homepage.checkForXUsername(0));
+		homepage.editXCredential(0);
+		driver.switchTo().activeElement();
+		Assertions.assertEquals("4321", credentialModal.returnOriginalPassword(driver));
+	}
+
+	public void uploadCredential() {
+		signupAndSignIn();
+		HomePage homepage = new HomePage(driver);
+		homepage.goToAddCredential(driver);
+		driver.switchTo().activeElement();
+		CredentialModal credentialModal = new CredentialModal(driver);
+		credentialModal.enterCredentials("google.com", "rimesta", "1234", driver);
+		ResultsPage resultPage = new ResultsPage(driver);
+		resultPage.clickContSuccess();
+	}
+
+	@Test
+	public void deleteUploadedCredential() throws InterruptedException {
+		uploadCredential();
+		HomePage homepage = new HomePage(driver);
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("delete-btn-credential")));
+		homepage.deleteXCredential(0);
+		driver.switchTo().activeElement();
+		//The only way this test works is if I submit the btn directly. Though the click does work when tested in person.
+		WebElement bttn = driver.findElement(By.id("delete-btn-modal"));
+		bttn.submit();
+		ResultsPage resultPage = new ResultsPage(driver);
+		resultPage.clickContSuccess();
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("credentialUrl")));
+		Assertions.assertEquals("ExampleUrl.com", homepage.checkForXUrl(0));
+	}
+
+	public static boolean isDisplayed(WebElement element) {
+		try {
+			if(element.isDisplayed())
+				return element.isDisplayed();
+		}catch (NoSuchElementException ex) {
+			return false;
+		}
+		return false;
+	}
 
 }

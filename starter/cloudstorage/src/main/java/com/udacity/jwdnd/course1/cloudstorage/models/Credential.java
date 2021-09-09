@@ -3,9 +3,28 @@ package com.udacity.jwdnd.course1.cloudstorage.models;
 public class Credential {
     private Integer credentialId;
     private String url;
+    private String username;
     private String key;
     private String password;
     private Integer userId;
+
+    public Credential(String url, String password, String username, int id) {
+        this.url = url;
+        this.username = username;
+        this.password = password;
+        credentialId = id;
+    }
+
+    public Credential(Integer credentialId, String url, String username, String key, String password, Integer userId) {
+        this.credentialId = credentialId;
+        this.url = url;
+        this.username = username;
+        this.password = password;
+        this.key = key;
+    }
+
+    public Credential() {}
+
 
     public Integer getCredentialId() {
         return credentialId;
@@ -17,6 +36,14 @@ public class Credential {
 
     public String getUrl() {
         return url;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setUrl(String url) {
