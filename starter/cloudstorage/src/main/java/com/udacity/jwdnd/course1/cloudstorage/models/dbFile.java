@@ -25,6 +25,8 @@ public class dbFile {
         this.fileData = fileData;
     }
 
+    public dbFile() {}
+
     public Integer getFileId() {
         return fileId;
     }

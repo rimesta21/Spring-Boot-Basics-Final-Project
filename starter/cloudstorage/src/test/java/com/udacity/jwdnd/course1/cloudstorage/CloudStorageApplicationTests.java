@@ -1,9 +1,6 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
-import com.udacity.jwdnd.course1.cloudstorage.pages.HomePage;
-import com.udacity.jwdnd.course1.cloudstorage.pages.LoginPage;
-import com.udacity.jwdnd.course1.cloudstorage.pages.ResultsPage;
-import com.udacity.jwdnd.course1.cloudstorage.pages.SignupPage;
+import com.udacity.jwdnd.course1.cloudstorage.pages.*;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
@@ -36,6 +33,7 @@ class CloudStorageApplicationTests {
 
 	@AfterEach
 	public void afterEach() {
+		//TODO: delete the user created
 		if (this.driver != null) {
 			driver.quit();
 		}
@@ -141,13 +139,14 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
-	public void testViewDownloadFile() {
+	public void testViewDownloadFile() throws InterruptedException {
 		signupAndSignIn();
 		uploadFile();
 		HomePage homepage = new HomePage(driver);
 		homepage.viewXFile(0);
-		ResultsPage resultPage = new ResultsPage(driver);
-		resultPage.downloadFile(driver);
+		driver.switchTo().activeElement();
+		ViewDeleteModal viewDeleteModal = new ViewDeleteModal(driver);
+		viewDeleteModal.downloadFile(driver);
 		Assertions.assertTrue(isFileDownloaded("C://Users/rimes/Downloads", "In my Mind (3).jpg"));
 	}
 
@@ -158,7 +157,8 @@ class CloudStorageApplicationTests {
 		resultPage.clickContSuccess();
 	}
 
-	private boolean isFileDownloaded(String downloadPath, String fileName) {
+	private boolean isFileDownloaded(String downloadPath, String fileName) throws InterruptedException {
+		Thread.sleep(2000);
 		File dir = new File(downloadPath);
 		File[] dirContents = dir.listFiles();
 
@@ -179,8 +179,10 @@ class CloudStorageApplicationTests {
 		HomePage homepage = new HomePage(driver);
 		Assertions.assertEquals("In my Mind (3).jpg", homepage.checkForXFile(0));
 		homepage.deleteXFile(0);
+		driver.switchTo().activeElement();
+		ViewDeleteModal viewDeleteModal = new ViewDeleteModal(driver);
+		viewDeleteModal.deleteFile(driver);
 		ResultsPage resultspage = new ResultsPage(driver);
-		resultspage.deleteFile(driver);
 		resultspage.clickContSuccess();
 		Assertions.assertEquals("ExampleFile.txt", homepage.checkForXFile(0));
 	}

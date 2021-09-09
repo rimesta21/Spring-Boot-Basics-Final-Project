@@ -19,28 +19,6 @@
                 <span th:text="${failed}" >Example Error Message</span>
                 <span >Click <a id = "linkFailed" th:href = "@{/home}">here</a> to continue.</span>
             </div>
-            <div th:if="${viewFile}" >
-                <h2 class="mt-5">File Details:</h2>
-                <h3 th:text="${'File Name: ' + fileView.getFileName()}" class="lead">File name:</h3>
-                <h3 th:text="${'File Type: ' + fileView.getContentType()}" class="lead">File Details:</h3>
-                <h3 th:text="${'File Size: ' + fileView.getFileSize()}" class="lead">File Details:</h3>
-                <form th:action="@{/home/download}" method = "GET">
-                    <button id = "download-btn" type="submit" th:name="fileName" th:value="${fileView.getFileName()}" class="btn mt-3 btn-primary" >Download</button>
-                </form>
-                <form th:action="@{/home}" method="GET">
-                    <button type="submit" class="btn  mt-2 btn-secondary ">Return Home</button>
-                </form>
-            </div>
-            <div th:if="${deleteFile}" class="alert alert-danger fill-parent">
-                <h1 class="display-5">Warning</h1>
-                <span th:text="${deleteMessage}" >Example Error Message</span>
-                <form th:action="@{/home/deleteFile}" method = "GET">
-                    <button id = "delete-btn" type="submit" th:name="fileName" th:value="${deleteMessageName}" class="btn mt-3 btn-danger" >Delete</button>
-                </form>
-                <form th:action="@{/home}" method="GET">
-                    <button type="submit" class="btn mt-2 btn-secondary">Cancel</button>
-                </form>
-            </div>
         </div>
     </body>
 </html>

@@ -51,16 +51,19 @@
                                 <tbody>
                                 <tr th:each = "fileName : ${files}">
                                     <td>
-                                        <form th:action="@{/home/view-delete}" method = "GET">
-                                            <button id = "view-btn" type="submit" th:name="action" th:value="${'nodele' + fileName}" class="btn btn-success">View</button>
-                                            <button id = "delete-btn" type="submit" th:name="action" th:value="${'delete'+fileName}" class="btn btn-danger">Delete</button>
-                                        </form>
+                                        <button id = "view-btn" type="button" data-toggle ="modal" data-target="#viewFileModal" th:data-id="${fileName}" class="btn btn-success">View</button>
+                                        <button id = "delete-btn" type="button" data-toggle ="modal" data-target="#deleteFileModal" th:data-id="${fileName}" class="btn btn-danger">Delete</button>
                                     </td>
                                     <th id = "fileNames" th:text="${fileName}" scope="row">ExampleFile.txt</th>
                                 </tr>
                                 </tbody>
                             </table>
+                            <th:block th:replace="modals/_modalsViewFile :: modal('viewFileModal')">modal</th:block>
+                            <th:block th:replace="modals/_modalsDeleteFile :: modal('deleteFileModal')">modal</th:block>
+
                         </div>
+
+
                     </div>
                     <div class="tab-pane fade" id="nav-notes" role="tabpanel" aria-labelledby="nav-notes-tab">
                         <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showNoteModal()">
@@ -188,13 +191,18 @@
             </div>
         </div>
 
-        <script th:src="@{/js/jquery-slim.min.js}"></script>
+<!--        <script th:src="@{/js/jquery-slim.min.js}"></script>
         <script th:src="@{/js/popper.min.js}"></script>
-        <script th:src="@{/js/bootstrap.min.js}"></script>
+        <script th:src="@{/js/bootstrap.min.js}"></script>-->
+
+        <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+        <script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
+        <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 
         <!--For opening the note modal-->
-        <script type="text/javascript">
+        <script th:inline = "javascript" type="text/javascript">
             // For opening the note modal
+/*
             function showNoteModal(noteId, noteTitle, noteDescription) {
                 $('#note-id').val(noteId ? noteId : '');
                 $('#note-title').val(noteTitle ? noteTitle : '');
@@ -210,6 +218,24 @@
                 $('#credential-password').val(password ? password : '');
                 $('#credentialModal').modal('show');
             }
+*/
+
+            $('#viewFileModal').on('show.bs.modal',function(event) {
+                let button = $(event.relatedTarget)
+                let fileName = button.data('id')
+               $.get("/modals/viewFile", {name : fileName}, function(data) {
+                   $('#viewFileModal').find(".modal-body").html(data);
+               })
+            });
+
+            $('#deleteFileModal').on('show.bs.modal',function(event) {
+                let button = $(event.relatedTarget)
+                let fileName = button.data('id')
+                $.get("/modals/deleteMessage", {name : fileName}, function(data) {
+                    $('#deleteFileModal').find(".modal-body").html(data);
+                })
+            });
+
         </script>
     </body>
 </html>
