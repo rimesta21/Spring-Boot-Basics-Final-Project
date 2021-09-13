@@ -1,0 +1,12 @@
+<form action="#" th:action="@{/home/addNote}" method="POST">
+    <input type="hidden" name="noteId" th:value="${id}" id="note-id">
+    <div class="form-group">
+        <label for="note-title" class="col-form-label">Title</label>
+        <input type="text" name= "noteTitle" th:value = "${title}"class="form-control" id="note-title" maxlength="20" required>
+    </div>
+    <div class="form-group">
+        <label for="note-description" class="col-form-label">Description</label>
+        <textarea class="form-control" name="noteDescription" th:text = "${description}" id="note-description" rows="5" maxlength="1000" required></textarea>
+    </div>
+    <button id="noteSubmit" type="submit" class="d-none"></button>
+</form>

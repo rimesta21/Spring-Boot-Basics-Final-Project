@@ -3,12 +3,8 @@ package com.udacity.jwdnd.course1.cloudstorage.controllers;
 
 
 import com.udacity.jwdnd.course1.cloudstorage.models.Credential;
-import com.udacity.jwdnd.course1.cloudstorage.models.dbFile;
-import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
-import com.udacity.jwdnd.course1.cloudstorage.services.EncryptionService;
-import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
+import com.udacity.jwdnd.course1.cloudstorage.models.Note;
+import com.udacity.jwdnd.course1.cloudstorage.services.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,15 +23,20 @@ public class HomeController {
     private final FileService fileService;
     private final CredentialService credentialService;
     private final EncryptionService encryptionService;
+    private final NoteService noteService;
+    private final UserService userService;
 
-    public HomeController(FileService fileService, CredentialService credentialService, EncryptionService encryptionService) {
+    public HomeController(FileService fileService, CredentialService credentialService, EncryptionService encryptionService,
+                          NoteService noteService, UserService userService) {
         this.credentialService = credentialService;
         this.fileService = fileService;
         this.encryptionService = encryptionService;
+        this.noteService = noteService;
+        this.userService = userService;
     }
 
     @GetMapping()
-    public String firstTime(Authentication authentication, Model model) {
+    public String setUpHome(Authentication authentication, Model model) {
         int userId = Integer.parseInt(authentication.getName());
         List<String> fileName = fileService.getFileNames(userId);
         if(fileName.size() > 0) {
@@ -53,6 +54,15 @@ public class HomeController {
             model.addAttribute("credentials", temp);
         }
 
+        List<Note> notes = noteService.getAllUserNotes(userId);
+        if(notes.size() > 0) {
+            model.addAttribute("notes", notes);
+        } else {
+            List<Note> temp = new ArrayList<>();
+            temp.add(new Note("Example Note Title", "Example Note Description"));
+            model.addAttribute("notes", temp);
+        }
+
         return "home";
     }
 
@@ -60,15 +70,18 @@ public class HomeController {
     public String uploadFile(@RequestParam("fileUpload") MultipartFile fileUpload,
                              Authentication authentication, Model model) {
         int userId = Integer.parseInt(authentication.getName());
-        //TODO: Add a check to see if two files have the same name
-        int success = fileService.addFile(fileUpload, userId);
-        if(success == -1) {
-            model.addAttribute("failed", "It seems like there was an error converting you file. Please try again.");
-        } else if (success == 0) {
-            model.addAttribute("failed", "It seems like there was a network error. Please try again.");
+        if(fileService.doesFileNameExists(fileUpload.getOriginalFilename(), userId)) {
+            model.addAttribute("failed", "That file name already exists. Please change the name.");
         } else {
-            model.addAttribute("success", true);
-            model.addAttribute("files", fileService.getFileNames(userId));
+            int success = fileService.addFile(fileUpload, userId);
+            if (success == -1) {
+                model.addAttribute("failed", "It seems like there was an error converting you file. Please try again.");
+            } else if (success == 0) {
+                model.addAttribute("failed", "It seems like there was a network error. Please try again.");
+            } else {
+                model.addAttribute("success", true);
+                model.addAttribute("files", fileService.getFileNames(userId));
+            }
         }
         return "result";
     }
@@ -99,6 +112,28 @@ public class HomeController {
         }
         return "result";
     }
+
+    @PostMapping("/addNote")
+    public String addNote(Note note, Model model, Authentication authentication) {
+        //TODO: See if you can redirect to tab once done
+        String addNoteError = null;
+
+        int userId = Integer.parseInt(authentication.getName());
+        if(noteService.noteExists(note.getNoteId())) {
+            noteService.updateNote(note);
+            model.addAttribute("success",true);
+        } else {
+            note.setUserId(userId);
+            if (noteService.addNote(note)) {
+                model.addAttribute("success", true);
+            } else {
+                model.addAttribute("failed", "Sorry there was an error uploading your credentials. Please try again later.");
+            }
+        }
+        return "result";
+    }
+
+
 
 
 }

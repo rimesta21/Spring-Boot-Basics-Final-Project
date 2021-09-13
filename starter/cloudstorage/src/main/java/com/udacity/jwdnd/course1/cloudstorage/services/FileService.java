@@ -44,6 +44,10 @@ public class FileService {
         return fileMapper.getFileByFileName(fileName, userId);
     }
 
+    public boolean doesFileNameExists(String filename, Integer userId) {
+        return getFileByFileName(filename, userId) != null;
+    }
+
     public ResponseEntity<Resource> downloadFile(String fileName, Integer userId) throws Exception
     {
         try

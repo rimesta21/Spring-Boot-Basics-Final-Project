@@ -4,6 +4,7 @@ import com.udacity.jwdnd.course1.cloudstorage.models.dbFile;
 import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
 import com.udacity.jwdnd.course1.cloudstorage.services.EncryptionService;
 import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
+import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,21 +20,22 @@ public class ModalController {
 
     private final FileService fileService;
     private final CredentialService credentialService;
-    private String tempFileName;
-    private Integer tempCredentialId;
     private final EncryptionService encryptionService;
+    private final NoteService noteService;
+    private String[] deleteSwitch;
+    private String viewFileName;
 
-    public ModalController(FileService fileService, EncryptionService encryptionService, CredentialService credentialService) {
+    public ModalController(FileService fileService, EncryptionService encryptionService, CredentialService credentialService,
+                           NoteService noteService) {
         this.encryptionService = encryptionService;
         this.fileService = fileService;
         this.credentialService = credentialService;
-        tempFileName = null;
-        tempCredentialId = null;
+        this.noteService = noteService;
     }
 
     @GetMapping("viewFile")
     public String modal1(@RequestParam("name") String fileName, Model model, Authentication authentication) {
-        tempFileName = fileName;
+        viewFileName = fileName;
         dbFile file = fileService.getFileByFileName(fileName, Integer.parseInt(authentication.getName()));
         model.addAttribute("fileView", file);
         return "modals/viewFileModal";
@@ -41,13 +43,14 @@ public class ModalController {
 
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadFile(Authentication authentication, Model model) throws Exception {
-        return fileService.downloadFile(tempFileName, Integer.parseInt(authentication.getName()));
+        return fileService.downloadFile(viewFileName, Integer.parseInt(authentication.getName()));
     }
 
     @GetMapping("deleteFileMessage")
     public String modal2(@RequestParam("name") String fileName, Model model, Authentication authentication) {
         model.addAttribute("deleteMessage", "Are you sure you want to delete \""+ fileName + "\"?");
-        tempFileName = fileName;
+        deleteSwitch = new String[3];
+        deleteSwitch[0] = fileName;
         model.addAttribute("deleteFile", true);
         return "modals/deleteFileModal";
     }
@@ -56,7 +59,8 @@ public class ModalController {
     public String modal3(@RequestParam("url") String url, @RequestParam("username") String username,
                          @RequestParam("password") String password,@RequestParam("id") Integer id,
                          @RequestParam("key") String key, Model model, Authentication authentication) {
-        tempCredentialId = id;
+        deleteSwitch = new String[3];
+        deleteSwitch[1] = String.valueOf(id);
         model.addAttribute("deleteMessage", "Are you sure you want to delete?");
         model.addAttribute("url", url);
         model.addAttribute("username", username);
@@ -69,12 +73,12 @@ public class ModalController {
     @GetMapping("/delete")
     public String deleteFile(Authentication authentication, Model model) {
         //TODO: Add a failed case
-        if(tempFileName != null) {
-            fileService.deleteFile(tempFileName, Integer.parseInt(authentication.getName()));
-            tempFileName = null;
-        } else if (tempCredentialId != null) {
-            credentialService.deleteCredential(tempCredentialId);
-            tempCredentialId = null;
+        if(deleteSwitch[0] != null) {
+            fileService.deleteFile(deleteSwitch[0], Integer.parseInt(authentication.getName()));
+        } else if (deleteSwitch[1] != null) {
+            credentialService.deleteCredential(Integer.parseInt(deleteSwitch[1]));
+        } else if (deleteSwitch[2] != null) {
+            noteService.deleteNote(Integer.parseInt(deleteSwitch[2]));
         }
         model.addAttribute("success", true);
         return "result";
@@ -94,6 +98,27 @@ public class ModalController {
         model.addAttribute("id", id);
         model.addAttribute("key",key);
         return "modals/credentialForm";
+    }
+
+    @GetMapping("/note")
+    public String note(@RequestParam("title") String title, @RequestParam("description") String description,
+                             @RequestParam("id") Integer id, Model model) {
+
+        model.addAttribute("title", title);
+        model.addAttribute("description", description);
+        model.addAttribute("id", id);
+        return "modals/noteForm";
+    }
+
+    @GetMapping("deleteNoteMessage")
+    public String modal4(@RequestParam("title") String title, @RequestParam("description") String description,
+                         @RequestParam("id") Integer id, Model model) {
+        deleteSwitch = new String[3];
+        deleteSwitch[2] = String.valueOf(id);
+        model.addAttribute("deleteMessage", "Are you sure you want to delete?");
+        model.addAttribute("noteTitle", title);
+        model.addAttribute("noteDescription", description);
+        return "modals/deleteNoteModal";
     }
 
 
