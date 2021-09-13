@@ -47,6 +47,24 @@ public class HomePage {
     @FindBy(id = "credentialPassword")
     private List<WebElement> credentialPassword;
 
+    @FindBy(id = "add-note")
+    private WebElement addNote;
+
+    @FindBy(id = "nav-notes-tab")
+    private WebElement notesTab;
+
+    @FindBy(id = "noteTitle")
+    private List<WebElement> noteTitle;
+
+    @FindBy(id = "noteDescription")
+    private List<WebElement> noteDescription;
+
+    @FindBy(id = "edit-btn-note")
+    private List<WebElement> editNote;
+
+    @FindBy(id = "delete-btn-note")
+    private List<WebElement> deleteNote;
+
     public HomePage(WebDriver driver) {
         PageFactory.initElements(driver, this);
     }
@@ -100,4 +118,27 @@ public class HomePage {
         return credentialPassword.get(index).getText();
     }
 
+    public void goToAddNote(WebDriver driver) {
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-notes-tab")));
+        notesTab.click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note")));
+        addNote.click();
+    }
+
+    public String checkForXNoteTitle(int index) {
+        return noteTitle.get(index).getText();
+    }
+
+    public String checkForXNoteDescription(int index) {
+        return noteDescription.get(index).getText();
+    }
+
+    public void editXNote(int index) {
+        editNote.get(index).click();
+    }
+
+    public void deleteXNote(int index) {
+        deleteNote.get(index).click();
+    }
 }

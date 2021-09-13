@@ -33,15 +33,10 @@ class CloudStorageApplicationTests {
 	@AfterEach
 	public void afterEach() {
 		//TODO: delete the user created
+		driver.get("http://localhost:" + this.port + "/home/deleteUser");
 		if (this.driver != null) {
 			driver.quit();
 		}
-	}
-
-	@Test
-	public void getLoginPage() {
-		driver.get("http://localhost:" + this.port + "/login");
-		Assertions.assertEquals("Login", driver.getTitle());
 	}
 
 	@Test
@@ -64,7 +59,9 @@ class CloudStorageApplicationTests {
 		WebElement errorMsg = driver.findElement(By.id("error-msg"));
 		Assertions.assertTrue(errorMsg.isDisplayed());
 		Assertions.assertEquals("The username already exists.",errorMsg.getText());
-
+		signup.goToLogin(driver);
+		LoginPage login = new LoginPage(driver);
+		login.fillOutLogin("rimesta", "1234");
 	}
 
 	@Test
@@ -79,6 +76,7 @@ class CloudStorageApplicationTests {
 		Assertions.assertTrue(errorMsg.isDisplayed());
 		Assertions.assertEquals("Invalid username or password",errorMsg.getText());
 		Assertions.assertEquals("Login", driver.getTitle());
+		login.fillOutLogin("rimesta", "1234");
 	}
 
 	@Test
@@ -93,12 +91,15 @@ class CloudStorageApplicationTests {
 		Assertions.assertTrue(errorMsg.isDisplayed());
 		Assertions.assertEquals("Invalid username or password",errorMsg.getText());
 		Assertions.assertEquals("Login", driver.getTitle());
+		login.fillOutLogin("rimesta", "1234");
 	}
 
 	@Test
 	public void testUnauthorizedHomeRequest() {
 		driver.get("http://localhost:" + this.port + "/home");
 		Assertions.assertEquals("Login", driver.getTitle());
+		//this is put in to make the test suit fluid
+		signupAndSignIn();
 	}
 
 	@Test
@@ -115,6 +116,7 @@ class CloudStorageApplicationTests {
 		wait.until(webDriver -> webDriver.findElement(By.id("logout")));
 		homepage.logout();
 		Assertions.assertEquals("Login", driver.getTitle());
+		login.fillOutLogin("rimesta","1234");
 	}
 
 	private void signupAndSignIn() {
@@ -238,7 +240,7 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
-	public void deleteUploadedCredential() throws InterruptedException {
+	public void deleteUploadedCredential() {
 		uploadCredential();
 		HomePage homepage = new HomePage(driver);
 		WebDriverWait wait = new WebDriverWait(driver, 10);
@@ -254,14 +256,67 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals("ExampleUrl.com", homepage.checkForXUrl(0));
 	}
 
-	public static boolean isDisplayed(WebElement element) {
-		try {
-			if(element.isDisplayed())
-				return element.isDisplayed();
-		}catch (NoSuchElementException ex) {
-			return false;
-		}
-		return false;
+
+	@Test
+	public void testUploadNote() {
+		signupAndSignIn();
+		HomePage homepage = new HomePage(driver);
+		homepage.goToAddNote(driver);
+		driver.switchTo().activeElement();
+		NotesModal notesModal = new NotesModal(driver);
+		notesModal.enterNote("Test", "Hey hows it going?", driver);
+		ResultsPage resultPage = new ResultsPage(driver);
+		resultPage.clickContSuccess();
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteTitle")));
+		Assertions.assertEquals("Test", homepage.checkForXNoteTitle(0));
+		Assertions.assertEquals("Hey hows it going?", homepage.checkForXNoteDescription(0));
+	}
+
+	public void uploadNote() {
+		signupAndSignIn();
+		HomePage homepage = new HomePage(driver);
+		homepage.goToAddNote(driver);
+		driver.switchTo().activeElement();
+		NotesModal notesModal = new NotesModal(driver);
+		notesModal.enterNote("Test", "Hey hows it going?", driver);
+		ResultsPage resultPage = new ResultsPage(driver);
+		resultPage.clickContSuccess();
+	}
+
+	@Test
+	public void testEditNote() {
+		uploadNote();
+		HomePage homepage = new HomePage(driver);
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("edit-btn-note")));
+		homepage.editXNote(0);
+		driver.switchTo().activeElement();
+		NotesModal notesModal = new NotesModal(driver);
+		notesModal.clearNotes(driver);
+		notesModal.enterNote("Test6", "This is a test.",  driver);
+		ResultsPage resultPage = new ResultsPage(driver);
+		resultPage.clickContSuccess();
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteTitle")));
+		Assertions.assertEquals("Test6", homepage.checkForXNoteTitle(0));
+		Assertions.assertEquals("This is a test.", homepage.checkForXNoteDescription(0));
+	}
+
+	@Test
+	public void deleteUploadedNote() {
+		uploadNote();
+		HomePage homepage = new HomePage(driver);
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("delete-btn-note")));
+		homepage.deleteXNote(0);
+		driver.switchTo().activeElement();
+		//The only way this test works is if I submit the btn directly. Though the click does work when tested in person.
+		WebElement bttn = driver.findElement(By.id("delete-btn-modal"));
+		bttn.submit();
+		ResultsPage resultPage = new ResultsPage(driver);
+		resultPage.clickContSuccess();
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("NoteTitle")));
+		Assertions.assertEquals("Example Note Title", homepage.checkForXNoteTitle(0));
 	}
 
 }
