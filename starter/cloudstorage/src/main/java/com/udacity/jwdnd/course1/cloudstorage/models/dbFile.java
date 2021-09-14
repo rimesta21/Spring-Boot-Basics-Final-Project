@@ -16,13 +16,16 @@ public class dbFile {
         this.fileData = fileData;
     }
 
-    public dbFile(Integer fileId, String fileName, String contentType, String fileSize, Integer userId, byte[] fileData) {
+    public dbFile(String fileName, Integer fileId) {
         this.fileId = fileId;
+        this.fileName = fileName;
+    }
+
+
+    public dbFile(String fileName, String contentType, String fileSize ){
         this.fileName = fileName;
         this.contentType = contentType;
         this.fileSize = fileSize;
-        this.userId = userId;
-        this.fileData = fileData;
     }
 
     public dbFile() {}

@@ -31,4 +31,12 @@ public class NoteService {
     public void deleteNote(Integer id) {
         noteMapper.delete(id);
     }
+
+    public boolean verifyUpdate(Note newNote, Note inDBNote) {
+        return newNote.getNoteTitle().equals(inDBNote.getNoteTitle())
+                && newNote.getNoteDescription().equals(inDBNote.getNoteDescription());
+    }
+
+
+    public Note getNote(Integer id) {return noteMapper.getNote(id);}
 }

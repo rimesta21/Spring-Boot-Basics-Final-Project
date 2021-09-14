@@ -4,6 +4,7 @@ package com.udacity.jwdnd.course1.cloudstorage.controllers;
 
 import com.udacity.jwdnd.course1.cloudstorage.models.Credential;
 import com.udacity.jwdnd.course1.cloudstorage.models.Note;
+import com.udacity.jwdnd.course1.cloudstorage.models.dbFile;
 import com.udacity.jwdnd.course1.cloudstorage.services.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -24,34 +25,26 @@ public class HomeController {
     private final CredentialService credentialService;
     private final EncryptionService encryptionService;
     private final NoteService noteService;
-    private final UserService userService;
+
 
     public HomeController(FileService fileService, CredentialService credentialService, EncryptionService encryptionService,
-                          NoteService noteService, UserService userService) {
+                          NoteService noteService) {
         this.credentialService = credentialService;
         this.fileService = fileService;
         this.encryptionService = encryptionService;
         this.noteService = noteService;
-        this.userService = userService;
     }
 
     @GetMapping()
     public String setUpHome(Authentication authentication, Model model) {
         int userId = Integer.parseInt(authentication.getName());
-        List<String> fileName = fileService.getFileNames(userId);
-        if(fileName.size() > 0) {
-            model.addAttribute("files", fileName);
+        List<dbFile> files = fileService.getUserFiles(userId);
+        if(files.size() > 0) {
+            model.addAttribute("files", files);
         } else {
-            model.addAttribute("files", "ExampleFile.txt");
-        }
-
-        List<Credential> credentials = credentialService.getAllUserCredentials(userId);
-        if(credentials.size() > 0) {
-            model.addAttribute("credentials", credentials);
-        } else {
-            List<Credential> temp = new ArrayList<>();
-            temp.add(new Credential("ExampleUrl.com", "examplePassword", "exampleUsername", -1));
-            model.addAttribute("credentials", temp);
+            List<dbFile> temp = new ArrayList<>();
+            temp.add(new dbFile("Example File Name.jpg", -1));
+            model.addAttribute("files", temp);
         }
 
         List<Note> notes = noteService.getAllUserNotes(userId);
@@ -59,8 +52,17 @@ public class HomeController {
             model.addAttribute("notes", notes);
         } else {
             List<Note> temp = new ArrayList<>();
-            temp.add(new Note("Example Note Title", "Example Note Description"));
+            temp.add(new Note("Example Note Title", "Example Note Description", -1));
             model.addAttribute("notes", temp);
+        }
+
+        List<Credential> credentials = credentialService.getAllUserCredentials(userId);
+        if(credentials.size() > 0) {
+            model.addAttribute("credentials", credentials);
+        } else {
+            List<Credential> temp = new ArrayList<>();
+            temp.add(new Credential("ExampleUrl.com", "examplePassword", "exampleUsername", "1234" ,-1));
+            model.addAttribute("credentials", temp);
         }
 
         return "home";
@@ -80,22 +82,22 @@ public class HomeController {
                 model.addAttribute("failed", "It seems like there was a network error. Please try again.");
             } else {
                 model.addAttribute("success", true);
-                model.addAttribute("files", fileService.getFileNames(userId));
             }
         }
         return "result";
     }
 
     @PostMapping("/addCredential")
-    public String addCredential(Credential credential,Model model, Authentication authentication) {
-        //TODO: See if you can redirect to tab once done
-        String addCredentialError = null;
-        credential.getKey();
+    public String addCredential(Credential credential, Model model, Authentication authentication) {
         int userId = Integer.parseInt(authentication.getName());
         if(credentialService.credentialExists(credential.getCredentialId())) {
             credential.setPassword(encryptionService.encryptValue(credential.getPassword(), credential.getKey()));
             credentialService.updateCredential(credential);
-            model.addAttribute("success",true);
+            if(credentialService.verifyUpdate(credential, credentialService.getCredential(credential.getCredentialId()))) {
+                model.addAttribute("success", true);
+            } else {
+                model.addAttribute("failed", "Sorry there was an error updating your credentials. Please try again later.");
+            }
         } else {
             SecureRandom random = new SecureRandom();
             byte[] key = new byte[16];
@@ -115,19 +117,21 @@ public class HomeController {
 
     @PostMapping("/addNote")
     public String addNote(Note note, Model model, Authentication authentication) {
-        //TODO: See if you can redirect to tab once done
-        String addNoteError = null;
 
         int userId = Integer.parseInt(authentication.getName());
         if(noteService.noteExists(note.getNoteId())) {
             noteService.updateNote(note);
-            model.addAttribute("success",true);
+            if(noteService.verifyUpdate(note, noteService.getNote(note.getNoteId()))) {
+                model.addAttribute("success", true);
+            } else {
+                model.addAttribute("failed", "Sorry there was an error uploading your note. Please try again later.");
+            }
         } else {
             note.setUserId(userId);
             if (noteService.addNote(note)) {
                 model.addAttribute("success", true);
             } else {
-                model.addAttribute("failed", "Sorry there was an error uploading your credentials. Please try again later.");
+                model.addAttribute("failed", "Sorry there was an error uploading your note. Please try again later.");
             }
         }
         return "result";

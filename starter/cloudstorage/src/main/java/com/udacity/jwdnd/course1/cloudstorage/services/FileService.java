@@ -36,23 +36,23 @@ public class FileService {
         return 1;
     }
 
-    public List<String> getFileNames(int userId) {
-        return fileMapper.getFileNames(userId);
+    public List<dbFile> getUserFiles(int userId) {
+        return fileMapper.getUserFiles(userId);
     }
 
-    public dbFile getFileByFileName(String fileName, Integer userId) {
-        return fileMapper.getFileByFileName(fileName, userId);
+    public dbFile getFileById(Integer fileId) {
+        return fileMapper.getFileById(fileId);
     }
 
     public boolean doesFileNameExists(String filename, Integer userId) {
-        return getFileByFileName(filename, userId) != null;
+        return fileMapper.getFileByName(filename, userId) != null;
     }
 
-    public ResponseEntity<Resource> downloadFile(String fileName, Integer userId) throws Exception
+    public ResponseEntity<Resource> downloadFile(Integer fileId) throws Exception
     {
         try
         {
-            dbFile file = fileMapper.getFileByFileName(fileName, userId);
+            dbFile file = fileMapper.getFileById(fileId);
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(file.getContentType()))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFileName()+ "\"")
@@ -64,9 +64,14 @@ public class FileService {
         }
     }
 
-    public void deleteFile(String fileName, Integer userId) {
-        fileMapper.delete(fileName, userId);
+    public void deleteFile(Integer fileId) {
+        fileMapper.delete(fileId);
     }
+
+    public boolean doesFileExists(Integer fileId) {
+        return fileMapper.getFileById(fileId) != null;
+    }
+
 
 
 }

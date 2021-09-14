@@ -1,8 +1,5 @@
 package com.udacity.jwdnd.course1.cloudstorage.pages;
 
-import com.udacity.jwdnd.course1.cloudstorage.controllers.LoginController;
-import com.udacity.jwdnd.course1.cloudstorage.mappers.UserMapper;
-import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -20,9 +17,6 @@ public class LoginPage {
 
     @FindBy(id = "signup-link")
     private WebElement signup;
-
-    @FindBy(id = "deleteUser")
-    private WebElement deleteUser;
 
     public LoginPage(WebDriver driver) {
         PageFactory.initElements(driver, this);

@@ -59,9 +59,6 @@ class CloudStorageApplicationTests {
 		WebElement errorMsg = driver.findElement(By.id("error-msg"));
 		Assertions.assertTrue(errorMsg.isDisplayed());
 		Assertions.assertEquals("The username already exists.",errorMsg.getText());
-		signup.goToLogin(driver);
-		LoginPage login = new LoginPage(driver);
-		login.fillOutLogin("rimesta", "1234");
 	}
 
 	@Test
@@ -133,7 +130,7 @@ class CloudStorageApplicationTests {
 	public void testUploadFile() {
 		signupAndSignIn();
 		HomePage homepage = new HomePage(driver);
-		homepage.uploadFile(driver, "C://Users/rimes/OneDrive/Desktop/Java Practice/test.txt");
+		homepage.uploadFile("C://Users/rimes/OneDrive/Desktop/Java Practice/test.txt");
 		ResultsPage resultPage = new ResultsPage(driver);
 		resultPage.clickContSuccess();
 		Assertions.assertEquals("test.txt", homepage.checkForXFile(0));
@@ -153,7 +150,7 @@ class CloudStorageApplicationTests {
 
 	private void uploadFile() {
 		HomePage homepage = new HomePage(driver);
-		homepage.uploadFile(driver, "C://Users/rimes/OneDrive/Pictures/In my Mind (3).jpg");
+		homepage.uploadFile("C://Users/rimes/OneDrive/Pictures/In my Mind (3).jpg");
 		ResultsPage resultPage = new ResultsPage(driver);
 		resultPage.clickContSuccess();
 	}
@@ -185,7 +182,7 @@ class CloudStorageApplicationTests {
 		viewDeleteModal.delete(driver);
 		ResultsPage resultspage = new ResultsPage(driver);
 		resultspage.clickContSuccess();
-		Assertions.assertEquals("ExampleFile.txt", homepage.checkForXFile(0));
+		Assertions.assertEquals("Example File Name.jpg", homepage.checkForXFile(0));
 	}
 
 	@Test

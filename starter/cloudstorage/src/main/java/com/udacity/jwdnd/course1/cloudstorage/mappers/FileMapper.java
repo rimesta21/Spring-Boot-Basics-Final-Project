@@ -12,13 +12,16 @@ public interface FileMapper {
     @Options(useGeneratedKeys = true, keyProperty = "fileId")
     int insert(dbFile file);
 
-    @Select("SELECT fileName FROM FILES WHERE userId = #{userId}")
-    List<String>  getFileNames(int userId);
+    @Select("SELECT * FROM FILES WHERE userId = #{userId}")
+    List<dbFile>  getUserFiles(int userId);
+
+    @Select("SELECT * FROM FILES WHERE fileId = #{fileId}")
+    dbFile getFileById(Integer fileId);
 
     @Select("SELECT * FROM FILES WHERE fileName = #{fileName} AND userId = #{userId}")
-    dbFile getFileByFileName(String fileName, Integer userId);
+    dbFile getFileByName(String fileName, Integer userId);
 
-    @Delete("DELETE FROM FILES WHERE fileName = #{fileName} AND userId = #{userId}")
-    void delete(String fileName, Integer userId);
+    @Delete("DELETE FROM FILES WHERE fileId = #{fileId}")
+    void delete(Integer fileId);
 
 }

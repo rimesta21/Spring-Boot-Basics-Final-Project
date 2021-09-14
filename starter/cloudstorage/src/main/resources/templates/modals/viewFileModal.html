@@ -1,4 +1,4 @@
 
-<h3 th:text="${'File Name: ' + fileView.getFileName()}" class="lead">File name:</h3>
-<h3 th:text="${'File Type: ' + fileView.getContentType()}" class="lead">File Details:</h3>
-<h3 th:text="${'File Size: ' + fileView.getFileSize()}" class="lead">File Details:</h3>
+<h3 th:text="${'File Name: ' + file.fileName}" class="lead">File name:</h3>
+<h3 th:text="${'File Type: ' + file.contentType}" class="lead">File Details:</h3>
+<h3 th:text="${'File Size: ' + file.fileSize + ' MB'}" class="lead">File Details:</h3>

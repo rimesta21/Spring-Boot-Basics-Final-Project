@@ -10,6 +10,11 @@
     </head>
     <body class="p-3 mb-2 bg-light text-black">
         <div class="container justify-content-center w-50 p-3" style="margin-top: 5em;">
+            <div th:if="${test}" class="alert alert-info fill-parent">
+                <h1 class="display-5">Example Result Page</h1>
+                <span th:text="${testMessage}">Example Message</span>
+                <span> To return home please click <a th:href="@{/home}">here</a> to continue.</span>
+            </div>
             <div th:if="${success}" class="alert alert-success fill-parent">
                 <h1 class="display-5">Success</h1>
                 <span >Your changes were successfully saved. Click <a id = "linkSuccess" th:href="@{/home}">here</a> to continue.</span>

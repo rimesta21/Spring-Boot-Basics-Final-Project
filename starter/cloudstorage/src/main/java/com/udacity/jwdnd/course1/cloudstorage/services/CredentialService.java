@@ -33,4 +33,14 @@ public class CredentialService {
     public void deleteCredential(Integer id) {
         credentialMapper.delete(id);
     }
+
+    public boolean verifyUpdate(Credential newCredential, Credential inDBCredential) {
+       return newCredential.getPassword().equals(inDBCredential.getPassword())
+               && newCredential.getUsername().equals(inDBCredential.getUsername())
+               && newCredential.getUrl().equals(inDBCredential.getUrl());
+    }
+
+    public Credential getCredential(Integer credentialId) {
+        return credentialMapper.getCredential(credentialId);
+    }
 }

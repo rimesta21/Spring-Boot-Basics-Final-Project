@@ -73,7 +73,7 @@ public class HomePage {
         logout.click();
     }
 
-    public void uploadFile(WebDriver driver, String filePath) {
+    public void uploadFile(String filePath) {
         fileUpload.sendKeys(filePath);
         fileUpload.submit();
     }
