@@ -22,4 +22,7 @@ public interface NoteMapper {
 
     @Delete("DELETE FROM NOTES WHERE noteId = #{id}")
     void delete(Integer id);
+
+    @Select("SELECT * FROM NOTES WHERE noteTitle = #{noteTitle} AND noteDescription = #{noteDescription} AND userId = #{userId}")
+    Note checkIfNoteExist(String noteTitle, String noteDescription ,Integer userId);
 }

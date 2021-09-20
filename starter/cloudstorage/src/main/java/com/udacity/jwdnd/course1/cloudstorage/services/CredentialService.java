@@ -43,4 +43,8 @@ public class CredentialService {
     public Credential getCredential(Integer credentialId) {
         return credentialMapper.getCredential(credentialId);
     }
+
+    public boolean duplicateCredential(Credential credential, Integer userId ) {
+        return credentialMapper.checkIfCredentialExist(credential.getUrl(),credential.getUsername(), userId) != null;
+    }
 }

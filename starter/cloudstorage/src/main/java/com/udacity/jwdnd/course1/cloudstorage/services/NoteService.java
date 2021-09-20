@@ -39,4 +39,20 @@ public class NoteService {
 
 
     public Note getNote(Integer id) {return noteMapper.getNote(id);}
+
+    public int noteError(Note note, Integer userId) {
+        if(note.getNoteTitle().length() > 20) {
+            //title too long
+            return -1;
+        } else if(note.getNoteDescription().length() > 1000) {
+            //description too long
+            return 0;
+        } else if(noteMapper.checkIfNoteExist(note.getNoteTitle(), note.getNoteDescription(), userId) != null) {
+            //duplicate note
+            return -2;
+        }
+        //It's okay to be added
+        return 1;
+    }
+
 }

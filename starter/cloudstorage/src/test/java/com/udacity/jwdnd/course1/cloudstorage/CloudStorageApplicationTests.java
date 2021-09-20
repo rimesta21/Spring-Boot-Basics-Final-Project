@@ -13,6 +13,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import java.io.File;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CloudStorageApplicationTests {
 
 	@LocalServerPort
@@ -40,106 +41,92 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
+	@Order(1)
 	public void testFromSignUptoLogin() {
 		driver.get("http://localhost:" + this.port + "/signup");
 		SignupPage signup = new SignupPage(driver);
-		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");
-		signup.goToLogin(driver);
+		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");;
 		LoginPage login = new LoginPage(driver);
 		login.fillOutLogin("rimesta", "1234");
 		Assertions.assertEquals("Home", driver.getTitle());
 	}
 
 	@Test
+	@Order(2)
 	public void testExistingUsername() {
 		driver.get("http://localhost:" + this.port + "/signup");
 		SignupPage signup = new SignupPage(driver);
 		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");
-		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");
 		WebElement errorMsg = driver.findElement(By.id("error-msg"));
 		Assertions.assertTrue(errorMsg.isDisplayed());
-		Assertions.assertEquals("The username already exists.",errorMsg.getText());
+		Assertions.assertEquals("The username already exists.", errorMsg.getText());
 	}
 
 	@Test
+	@Order(3)
 	public void testInvalidPassword() {
-		driver.get("http://localhost:" + this.port + "/signup");
-		SignupPage signup = new SignupPage(driver);
-		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");
-		signup.goToLogin(driver);
+		driver.get("http://localhost:" + this.port + "/home");
 		LoginPage login = new LoginPage(driver);
 		login.fillOutLogin("rimesta", "1423");
 		WebElement errorMsg = driver.findElement(By.id("error-msg"));
 		Assertions.assertTrue(errorMsg.isDisplayed());
 		Assertions.assertEquals("Invalid username or password",errorMsg.getText());
 		Assertions.assertEquals("Login", driver.getTitle());
-		login.fillOutLogin("rimesta", "1234");
 	}
 
 	@Test
+	@Order(4)
 	public void testInvalidUsername() {
-		driver.get("http://localhost:" + this.port + "/signup");
-		SignupPage signup = new SignupPage(driver);
-		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");
-		signup.goToLogin(driver);
+		driver.get("http://localhost:" + this.port + "/home");
 		LoginPage login = new LoginPage(driver);
-		login.fillOutLogin("rimetas", "1423");
+		login.fillOutLogin("rimetas", "1234");
 		WebElement errorMsg = driver.findElement(By.id("error-msg"));
 		Assertions.assertTrue(errorMsg.isDisplayed());
 		Assertions.assertEquals("Invalid username or password",errorMsg.getText());
 		Assertions.assertEquals("Login", driver.getTitle());
-		login.fillOutLogin("rimesta", "1234");
 	}
 
 	@Test
+	@Order(5)
 	public void testUnauthorizedHomeRequest() {
 		driver.get("http://localhost:" + this.port + "/home");
 		Assertions.assertEquals("Login", driver.getTitle());
-		//this is put in to make the test suit fluid
-		signupAndSignIn();
 	}
 
 	@Test
-	public void testFromLoginToSignupToHomeToLogOut() {
+	@Order(6)
+	public void testFromLoginToHomeToLogOut() {
 		driver.get("http://localhost:" + this.port + "/login");
 		LoginPage login = new LoginPage(driver);
-		login.goToSignUp();
-		SignupPage signup = new SignupPage(driver);
-		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");
-		signup.goToLogin(driver);
 		login.fillOutLogin("rimesta", "1234");
 		HomePage homepage = new HomePage(driver);
 		WebDriverWait wait = new WebDriverWait(driver, 10);
 		wait.until(webDriver -> webDriver.findElement(By.id("logout")));
 		homepage.logout();
 		Assertions.assertEquals("Login", driver.getTitle());
-		login.fillOutLogin("rimesta","1234");
 	}
 
-	private void signupAndSignIn() {
+	private void signIn() {
 		driver.get("http://localhost:" + this.port + "/login");
 		LoginPage login = new LoginPage(driver);
-		login.goToSignUp();
-		SignupPage signup = new SignupPage(driver);
-		signup.fillOutSignup("Rodrigo", "Mesta", "rimesta", "1234");
-		signup.goToLogin(driver);
 		login.fillOutLogin("rimesta", "1234");
 	}
 
 	@Test
+	@Order(7)
 	public void testUploadFile() {
-		signupAndSignIn();
+		signIn();
 		HomePage homepage = new HomePage(driver);
-		homepage.uploadFile("C://Users/rimes/OneDrive/Desktop/Java Practice/test.txt");
+		homepage.uploadFile("C://Users/rimes/OneDrive/Pictures/In my Mind (3).jpg");
 		ResultsPage resultPage = new ResultsPage(driver);
 		resultPage.clickContSuccess();
-		Assertions.assertEquals("test.txt", homepage.checkForXFile(0));
+		Assertions.assertEquals("In my Mind (3).jpg", homepage.checkForXFile(0));
 	}
 
 	@Test
+	@Order(8)
 	public void testViewDownloadFile() throws InterruptedException {
-		signupAndSignIn();
-		uploadFile();
+		signIn();
 		HomePage homepage = new HomePage(driver);
 		homepage.viewXFile(0);
 		driver.switchTo().activeElement();
@@ -148,15 +135,8 @@ class CloudStorageApplicationTests {
 		Assertions.assertTrue(isFileDownloaded("C://Users/rimes/Downloads", "In my Mind (3).jpg"));
 	}
 
-	private void uploadFile() {
-		HomePage homepage = new HomePage(driver);
-		homepage.uploadFile("C://Users/rimes/OneDrive/Pictures/In my Mind (3).jpg");
-		ResultsPage resultPage = new ResultsPage(driver);
-		resultPage.clickContSuccess();
-	}
-
 	private boolean isFileDownloaded(String downloadPath, String fileName) throws InterruptedException {
-		Thread.sleep(2000);
+		Thread.sleep(5000);
 		File dir = new File(downloadPath);
 		File[] dirContents = dir.listFiles();
 
@@ -171,9 +151,9 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
+	@Order(9)
 	public void testDeleteUploadedFile() {
-		signupAndSignIn();
-		uploadFile();
+		signIn();
 		HomePage homepage = new HomePage(driver);
 		Assertions.assertEquals("In my Mind (3).jpg", homepage.checkForXFile(0));
 		homepage.deleteXFile(0);
@@ -181,21 +161,25 @@ class CloudStorageApplicationTests {
 		ViewDeleteModal viewDeleteModal = new ViewDeleteModal(driver);
 		viewDeleteModal.delete(driver);
 		ResultsPage resultspage = new ResultsPage(driver);
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("linkSuccess")));
 		resultspage.clickContSuccess();
 		Assertions.assertEquals("Example File Name.jpg", homepage.checkForXFile(0));
 	}
 
 	@Test
+	@Order(10)
 	public void testUploadCredential() {
-		signupAndSignIn();
+		signIn();
 		HomePage homepage = new HomePage(driver);
 		homepage.goToAddCredential(driver);
 		driver.switchTo().activeElement();
 		CredentialModal credentialModal = new CredentialModal(driver);
 		credentialModal.enterCredentials("google.com", "rimesta", "1234", driver);
 		ResultsPage resultPage = new ResultsPage(driver);
-		resultPage.clickContSuccess();
 		WebDriverWait wait = new WebDriverWait(driver, 10);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("linkSuccess")));
+		resultPage.clickContSuccess();
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("credentialUrl")));
 		Assertions.assertEquals("google.com", homepage.checkForXUrl(0));
 		Assertions.assertEquals("rimesta", homepage.checkForXUsername(0));
@@ -203,9 +187,11 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
+	@Order(11)
 	public void testEditCredential() {
-		uploadCredential();
+		signIn();
 		HomePage homepage = new HomePage(driver);
+		homepage.goToCredentialTab(driver);
 		WebDriverWait wait = new WebDriverWait(driver, 10);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("edit-btn-credential")));
 		homepage.editXCredential(0);
@@ -216,6 +202,7 @@ class CloudStorageApplicationTests {
 		credentialModal.clearCredentials(driver);
 		credentialModal.enterCredentials("google1.com", "rimesta11", "4321", driver);
 		ResultsPage resultPage = new ResultsPage(driver);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("linkSuccess")));
 		resultPage.clickContSuccess();
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("credentialUrl")));
 		Assertions.assertEquals("google1.com", homepage.checkForXUrl(0));
@@ -225,28 +212,20 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals("4321", credentialModal.returnOriginalPassword(driver));
 	}
 
-	public void uploadCredential() {
-		signupAndSignIn();
-		HomePage homepage = new HomePage(driver);
-		homepage.goToAddCredential(driver);
-		driver.switchTo().activeElement();
-		CredentialModal credentialModal = new CredentialModal(driver);
-		credentialModal.enterCredentials("google.com", "rimesta", "1234", driver);
-		ResultsPage resultPage = new ResultsPage(driver);
-		resultPage.clickContSuccess();
-	}
 
 	@Test
+	@Order(12)
 	public void deleteUploadedCredential() {
-		uploadCredential();
+		signIn();
 		HomePage homepage = new HomePage(driver);
+		homepage.goToCredentialTab(driver);
 		WebDriverWait wait = new WebDriverWait(driver, 10);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("delete-btn-credential")));
 		homepage.deleteXCredential(0);
 		driver.switchTo().activeElement();
 		//The only way this test works is if I submit the btn directly. Though the click does work when tested in person.
-		WebElement bttn = driver.findElement(By.id("delete-btn-modal"));
-		bttn.submit();
+		WebElement btn = driver.findElement(By.id("delete-btn-modal"));
+		btn.submit();
 		ResultsPage resultPage = new ResultsPage(driver);
 		resultPage.clickContSuccess();
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("credentialUrl")));
@@ -255,8 +234,9 @@ class CloudStorageApplicationTests {
 
 
 	@Test
+	@Order(13)
 	public void testUploadNote() {
-		signupAndSignIn();
+		signIn();
 		HomePage homepage = new HomePage(driver);
 		homepage.goToAddNote(driver);
 		driver.switchTo().activeElement();
@@ -270,21 +250,12 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals("Hey hows it going?", homepage.checkForXNoteDescription(0));
 	}
 
-	public void uploadNote() {
-		signupAndSignIn();
-		HomePage homepage = new HomePage(driver);
-		homepage.goToAddNote(driver);
-		driver.switchTo().activeElement();
-		NotesModal notesModal = new NotesModal(driver);
-		notesModal.enterNote("Test", "Hey hows it going?", driver);
-		ResultsPage resultPage = new ResultsPage(driver);
-		resultPage.clickContSuccess();
-	}
-
 	@Test
+	@Order(14)
 	public void testEditNote() {
-		uploadNote();
+		signIn();
 		HomePage homepage = new HomePage(driver);
+		homepage.goToNoteTab(driver);
 		WebDriverWait wait = new WebDriverWait(driver, 10);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("edit-btn-note")));
 		homepage.editXNote(0);
@@ -300,9 +271,11 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
+	@Order(15)
 	public void deleteUploadedNote() {
-		uploadNote();
+		signIn();
 		HomePage homepage = new HomePage(driver);
+		homepage.goToNoteTab(driver);
 		WebDriverWait wait = new WebDriverWait(driver, 10);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("delete-btn-note")));
 		homepage.deleteXNote(0);
@@ -312,7 +285,7 @@ class CloudStorageApplicationTests {
 		bttn.submit();
 		ResultsPage resultPage = new ResultsPage(driver);
 		resultPage.clickContSuccess();
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("NoteTitle")));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteTitle")));
 		Assertions.assertEquals("Example Note Title", homepage.checkForXNoteTitle(0));
 	}
 

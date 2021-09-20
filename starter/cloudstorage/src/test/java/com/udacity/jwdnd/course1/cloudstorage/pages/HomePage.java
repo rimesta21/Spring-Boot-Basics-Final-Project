@@ -92,10 +92,15 @@ public class HomePage {
 
     public void goToAddCredential(WebDriver driver) {
         WebDriverWait wait = new WebDriverWait(driver, 10);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-credentials-tab")));
-        credentialsTab.click();
+        goToCredentialTab(driver);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-credential")));
         addCredential.click();
+    }
+
+    public void goToCredentialTab(WebDriver driver) {
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-credentials-tab")));
+        credentialsTab.click();
     }
 
     public void editXCredential(int index) {
@@ -120,10 +125,15 @@ public class HomePage {
 
     public void goToAddNote(WebDriver driver) {
         WebDriverWait wait = new WebDriverWait(driver, 10);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-notes-tab")));
-        notesTab.click();
+        goToNoteTab(driver);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-note")));
         addNote.click();
+    }
+
+    public void goToNoteTab(WebDriver driver) {
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-notes-tab")));
+        notesTab.click();
     }
 
     public String checkForXNoteTitle(int index) {

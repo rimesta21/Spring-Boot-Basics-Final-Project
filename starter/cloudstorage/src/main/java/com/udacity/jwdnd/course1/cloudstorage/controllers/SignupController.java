@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.concurrent.TimeUnit;
+
 @Controller
 @RequestMapping("/signup")
 public class SignupController {
@@ -20,13 +22,17 @@ public class SignupController {
     }
 
     @GetMapping()
-    public String signupView() {
+    public String signupView(Model model) {
         return "signup";
     }
 
 
     @PostMapping()
-    public String signupUser(@ModelAttribute User user, Model model) {
+    public String signupUser(@ModelAttribute User user, Model model) throws InterruptedException {
+        if(model.getAttribute("signupSuccess") != null) {
+            TimeUnit.SECONDS.sleep(1);
+            return "login";
+        }
         String signupError = null;
 
         if (!userService.isUsernameAvailable(user.getUsername())) {
@@ -42,11 +48,11 @@ public class SignupController {
 
         if (signupError == null) {
             model.addAttribute("signupSuccess", true);
+            return "login";
         } else {
             model.addAttribute("signupError", signupError);
         }
 
         return "signup";
     }
-
 }

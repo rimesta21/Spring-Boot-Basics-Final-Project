@@ -71,45 +71,53 @@ public class HomeController {
     @PostMapping("/file-upload")
     public String uploadFile(@RequestParam("fileUpload") MultipartFile fileUpload,
                              Authentication authentication, Model model) {
-        int userId = Integer.parseInt(authentication.getName());
-        if(fileService.doesFileNameExists(fileUpload.getOriginalFilename(), userId)) {
-            model.addAttribute("failed", "That file name already exists. Please change the name.");
-        } else {
-            int success = fileService.addFile(fileUpload, userId);
-            if (success == -1) {
-                model.addAttribute("failed", "It seems like there was an error converting you file. Please try again.");
-            } else if (success == 0) {
-                model.addAttribute("failed", "It seems like there was a network error. Please try again.");
-            } else {
-                model.addAttribute("success", true);
-            }
-        }
+       if(fileUpload.getOriginalFilename().equals("")) {
+           model.addAttribute("failed", "It seems that no file was selected to be upload. Please select a file and try again.");
+       } else {
+           int userId = Integer.parseInt(authentication.getName());
+           if (fileService.doesFileNameExists(fileUpload.getOriginalFilename(), userId)) {
+               model.addAttribute("failed", "That file name already exists. Please change the name.");
+           } else {
+               int success = fileService.addFile(fileUpload, userId);
+               if (success == -1) {
+                   model.addAttribute("failed", "It seems like there was an error converting you file. Please try again.");
+               } else if (success == 0) {
+                   model.addAttribute("failed", "It seems like there was a network error. Please try again.");
+               } else {
+                   model.addAttribute("success", true);
+               }
+           }
+       }
         return "result";
     }
 
     @PostMapping("/addCredential")
     public String addCredential(Credential credential, Model model, Authentication authentication) {
         int userId = Integer.parseInt(authentication.getName());
-        if(credentialService.credentialExists(credential.getCredentialId())) {
-            credential.setPassword(encryptionService.encryptValue(credential.getPassword(), credential.getKey()));
-            credentialService.updateCredential(credential);
-            if(credentialService.verifyUpdate(credential, credentialService.getCredential(credential.getCredentialId()))) {
-                model.addAttribute("success", true);
-            } else {
-                model.addAttribute("failed", "Sorry there was an error updating your credentials. Please try again later.");
-            }
+        if(credentialService.duplicateCredential(credential, userId)) {
+            model.addAttribute("failed", "You already have a credential with the same username with this website. Please change one or delete the original.");
         } else {
-            SecureRandom random = new SecureRandom();
-            byte[] key = new byte[16];
-            random.nextBytes(key);
-            String encodedKey = Base64.getEncoder().encodeToString(key);
-            credential.setKey(encodedKey);
-            credential.setPassword(encryptionService.encryptValue(credential.getPassword(), encodedKey));
-            credential.setUserId(userId);
-            if (credentialService.addCredential(credential)) {
-                model.addAttribute("success", true);
+            if (credentialService.credentialExists(credential.getCredentialId())) {
+                credential.setPassword(encryptionService.encryptValue(credential.getPassword(), credential.getKey()));
+                credentialService.updateCredential(credential);
+                if (credentialService.verifyUpdate(credential, credentialService.getCredential(credential.getCredentialId()))) {
+                    model.addAttribute("success", true);
+                } else {
+                    model.addAttribute("failed", "Sorry there was an error updating your credentials. Please try again later.");
+                }
             } else {
-                model.addAttribute("failed", "Sorry there was an error uploading your credentials. Please try again later.");
+                SecureRandom random = new SecureRandom();
+                byte[] key = new byte[16];
+                random.nextBytes(key);
+                String encodedKey = Base64.getEncoder().encodeToString(key);
+                credential.setKey(encodedKey);
+                credential.setPassword(encryptionService.encryptValue(credential.getPassword(), encodedKey));
+                credential.setUserId(userId);
+                if (credentialService.addCredential(credential)) {
+                    model.addAttribute("success", true);
+                } else {
+                    model.addAttribute("failed", "Sorry there was an error uploading your credentials. Please try again later.");
+                }
             }
         }
         return "result";
@@ -117,8 +125,19 @@ public class HomeController {
 
     @PostMapping("/addNote")
     public String addNote(Note note, Model model, Authentication authentication) {
-
         int userId = Integer.parseInt(authentication.getName());
+        int noteError = noteService.noteError(note, userId);
+        if(noteError < 1) {
+            if(noteError == -1) {
+                model.addAttribute("failed", "Sorry your note title can't be longer than 20 characters. Please try again.");
+            } else if (noteError == 0){
+                model.addAttribute("failed", "Sorry your note description can't be longer than 1000 characters. Please try again.");
+            } else {
+                model.addAttribute("failed", "You already have a note with the same title and description. Please change one or delete the original.");
+            }
+            return "result";
+        }
+
         if(noteService.noteExists(note.getNoteId())) {
             noteService.updateNote(note);
             if(noteService.verifyUpdate(note, noteService.getNote(note.getNoteId()))) {
